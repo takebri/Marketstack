@@ -10,3 +10,9 @@ api_key = Marketstack_API_KEY
 symbol = 'ORCL'
 # The Marketstack endpoint for end-of-day stock data
 url = f'http://api.marketstack.com/v1/eod?access_key={api_key}&symbols={symbol}'
+
+# Make the API request
+response = requests.get(url)
+
+if response.status_code == 200:
+    data = response.json()
