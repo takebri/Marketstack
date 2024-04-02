@@ -2,15 +2,15 @@
 
 import requests
 import csv
-from configure import Marketstack_API_KEY
+from configure import marketstack_api_key
 
 # Marketstack API key
-api_key = Marketstack_API_KEY
+api_key = marketstack_api_key
 # The stock symbol
 symbol = 'ORCL'
-# The Marketstack endpoint for end-of-day stock data
-url = f'http://api.marketstack.com/v1/eod?access_key={api_key}& symbols={symbol}'
-# CSV output
+# marketstack api endpoint for end-of-day stock data
+url = f'http://api.marketstack.com/v1/eod?access_key={api_key}&symbols={symbol}'
+# csv output
 output_csv = 'stock_data.csv'
 
 
@@ -20,13 +20,13 @@ response = requests.get(url)
 if response.status_code == 200:
     stock_data = response.json()
 
-    # stock_data['data'] contains the returned data object
+    # Open csv 
     with open(output_csv, 'w', newline='') as file:
         writer = csv.writer(file)
         # Write the header
         writer.writerow(['Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
 
-        # Write the stock data
+        # Write stock_data['data'] to csv
         for item in stock_data['data']:
             writer.writerow([
                 item['date'],
