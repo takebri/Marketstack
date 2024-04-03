@@ -1,6 +1,5 @@
 configure.py
 __pycache__/
-*.py
 *.pyc
 pycache/*
 *.csv
