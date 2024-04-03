@@ -17,3 +17,22 @@ symbol = 'ORCL'
 # marketstack api endpoint for end-of-day stock data
 url = f'http://api.marketstack.com/v1/eod?access_key={api_key}&smybols={symbol}'
 
+# API request
+response = requests.get(url)
+
+# check for successful request
+if response.status_code == 200:
+    stock_data = response.json()
+
+    # save fetched data
+    rows_to_insert = [
+        {
+            'Date': row['date'],
+            'Open': row['open'],
+            'High': row['high'],
+            'Low': row['low'],
+            'Close': row['close'],
+            'Volume': row['volume']
+        }
+        for row in stock_data['data']
+    ]
