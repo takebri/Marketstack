@@ -24,8 +24,8 @@ try:
     response.raise_for_status()  
 
     # check for successful request
-    if response.status_code == 200:
-        stock_data = response.json()
+    if response.ok:
+        stock_data = response.json()['data']
 
         # save fetched data
         rows_to_insert = [
@@ -37,11 +37,11 @@ try:
                 'Close': row['close'],
                 'Volume': row['volume']
             }
-            for row in stock_data['data']
+            for row in stock_data
         ]
 
         errors = client.insert_rows_json(table_id, rows_to_insert)
-        if errors == []:
+        if not errors:
             print(f"Successfully added {len(rows_to_insert)} rows into {table_id}.")
         else:
             print('Error during BigQuery insertion', errors) 
