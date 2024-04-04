@@ -17,22 +17,35 @@ symbol = 'ORCL'
 # marketstack api endpoint for end-of-day stock data
 url = f'http://api.marketstack.com/v1/eod?access_key={api_key}&smybols={symbol}'
 
-# API request
-response = requests.get(url)
+try:
+    # API request
+    response = requests.get(url)
+    # Raise exception for HTTP error
+    response.raise_for_status()  
 
-# check for successful request
-if response.status_code == 200:
-    stock_data = response.json()
+    # check for successful request
+    if response.status_code == 200:
+        stock_data = response.json()
 
-    # save fetched data
-    rows_to_insert = [
-        {
-            'Date': row['date'],
-            'Open': row['open'],
-            'High': row['high'],
-            'Low': row['low'],
-            'Close': row['close'],
-            'Volume': row['volume']
-        }
-        for row in stock_data['data']
-    ]
+        # save fetched data
+        rows_to_insert = [
+            {
+                'Date': row['date'],
+                'Open': row['open'],
+                'High': row['high'],
+                'Low': row['low'],
+                'Close': row['close'],
+                'Volume': row['volume']
+            }
+            for row in stock_data['data']
+        ]
+
+        errors = client.insert_rows_json(table_id, rows_to_insert)
+        if errors == []:
+            print(f"Successfully added {len(rows_to_insert)} rows into {table_id}.")
+        else:
+            print('Error during BigQuery insertion', errors) 
+    else:
+        print('Failed to retrieve data:', response.status_code)
+except requests.RequestException as e:
+    print("Error during API request", e)
