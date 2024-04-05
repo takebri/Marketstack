@@ -27,6 +27,7 @@ try:
     if response.ok:
         stock_data = response.json()['data']
 
+        # Check for data
         if stock_data:
             # save fetched data
             rows_to_insert = [
@@ -41,15 +42,20 @@ try:
                 for row in stock_data
             ]
 
-        # insert data into bigquery
+        # Insert data into bigquery
         errors = client.insert_rows_json(table_id, rows_to_insert)
+        # No error inserting into BigQuery
         if not errors:
             print(f"Successfully added {len(rows_to_insert)} rows into {table_id}.")
+        # Error inserting into BigQuery
         else:
             print('Error during BigQuery insertion', errors)
+    # Error retrieving data
     else:
         print('Failed to retrieve data:', response.status_code)
+# API errors
 except requests.RequestException as e:
     print("Error during API request", e)
+# general errors
 except Exception as e:
     print("An unexpected error occurred:", e)
