@@ -15,7 +15,7 @@ api_key = marketstack_api_key
 # Stock symbol
 symbol = 'ORCL'
 # marketstack api endpoint for end-of-day stock data
-url = f'http://api.marketstack.com/v1/eod?access_key={api_key}&smybols={symbol}'
+url = f'http://api.marketstack.com/v1/eod?access_key={api_key}&symbols={symbol}'
 
 try:
     # API request
@@ -51,3 +51,5 @@ try:
         print('Failed to retrieve data:', response.status_code)
 except requests.RequestException as e:
     print("Error during API request", e)
+except Exception as e:
+    print("An unexpected error occurred:", e)
