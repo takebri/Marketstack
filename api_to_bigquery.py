@@ -21,30 +21,32 @@ try:
     # API request
     response = requests.get(url)
     # Raise exception for HTTP error
-    response.raise_for_status()  
+    response.raise_for_status()
 
     # check for successful request
     if response.ok:
         stock_data = response.json()['data']
 
-        # save fetched data
-        rows_to_insert = [
-            {
-                'Date': row['date'],
-                'Open': row['open'],
-                'High': row['high'],
-                'Low': row['low'],
-                'Close': row['close'],
-                'Volume': row['volume']
-            }
-            for row in stock_data
-        ]
+        if stock_data:
+            # save fetched data
+            rows_to_insert = [
+                {
+                    'Date': row['date'],
+                    'Open': row['open'],
+                    'High': row['high'],
+                    'Low': row['low'],
+                    'Close': row['close'],
+                    'Volume': row['volume']
+                }
+                for row in stock_data
+            ]
 
+        # insert data into bigquery
         errors = client.insert_rows_json(table_id, rows_to_insert)
         if not errors:
             print(f"Successfully added {len(rows_to_insert)} rows into {table_id}.")
         else:
-            print('Error during BigQuery insertion', errors) 
+            print('Error during BigQuery insertion', errors)
     else:
         print('Failed to retrieve data:', response.status_code)
 except requests.RequestException as e:
