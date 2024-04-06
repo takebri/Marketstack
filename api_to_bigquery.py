@@ -1,5 +1,6 @@
 # Script requests stock data from Marketstack REST API and uploads to BigQuery
 import requests
+from datetime import datetime
 from google.cloud import bigquery
 from configure import api_key, project_id, dataset_name, table_name
 
@@ -34,7 +35,8 @@ try:
             # save fetched data
             rows_to_insert = [
                 {
-                    'Date': row['date'],
+                    'Date': (datetime.strptime(row['date'], '%Y-%m-%d')
+                                     .strftime('%Y-%m-%d')),
                     'Open': row['open'],
                     'High': row['high'],
                     'Low': row['low'],
