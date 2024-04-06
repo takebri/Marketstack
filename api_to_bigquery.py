@@ -56,10 +56,17 @@ try:
             print('Error during BigQuery insertion', errors)
     # Error retrieving data
     else:
-        print('Failed to retrieve data:', response.status_code)
+        print('Failed to retrieve data. HTTP Status Code:',
+              response.status_code)
+
 # API errors
 except requests.RequestException as e:
     print("Error during API request", e)
+
+# BigQuery Error
+except bigquery.BigQueryError as e:
+    print("Error inserting data into BigQuery", e)
+
 # general errors
 except Exception as e:
     print("An unexpected error occurred:", e)
