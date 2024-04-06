@@ -36,7 +36,7 @@ try:
             # save fetched data
             rows_to_insert = [
                 {
-                    'Date': (datetime.strptime(row['date'], '%Y-%m-%d')
+                    'Date': (datetime.fromisoformat(row['date']).date()
                                      .strftime('%Y-%m-%d')),
                     'Open': row['open'],
                     'High': row['high'],
