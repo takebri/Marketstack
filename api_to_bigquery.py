@@ -1,7 +1,7 @@
-# A program that requests stock data from Marketstack REST API and uploads to BigQuery
+# Script requests stock data from Marketstack REST API and uploads to BigQuery
 import requests
 from google.cloud import bigquery
-from configure import marketstack_api_key, project_id, dataset_name, table_name
+from configure import api_key, project_id, dataset_name, table_name
 
 
 # Initialize BigQuery client
@@ -10,16 +10,18 @@ client = bigquery.Client()
 # Google Cloud project ID, dataset, table name
 table_id = f"{project_id}.{dataset_name}.{table_name}"
 
-# Marketstack API key
-api_key = marketstack_api_key
-# Stock symbol
-symbol = 'ORCL'
-# marketstack api endpoint for end-of-day stock data
-url = f'http://api.marketstack.com/v1/eod?access_key={api_key}&symbols={symbol}'
+# Parameters
+params = {
+    'access_key': api_key,
+    'symbols': 'ORCL'
+}
+
+# API endpoint for stock data
+url = 'http://api.marketstack.com/v1/eod'
 
 try:
     # API request
-    response = requests.get(url)
+    response = requests.get(url, params=params)
     # Raise exception for HTTP error
     response.raise_for_status()
 
@@ -46,7 +48,7 @@ try:
         errors = client.insert_rows_json(table_id, rows_to_insert)
         # No error inserting into BigQuery
         if not errors:
-            print(f"Successfully added {len(rows_to_insert)} rows into {table_id}.")
+            print(f"Added {len(rows_to_insert)} rows into {table_id}.")
         # Error inserting into BigQuery
         else:
             print('Error during BigQuery insertion', errors)
