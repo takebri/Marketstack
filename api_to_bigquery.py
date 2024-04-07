@@ -2,7 +2,7 @@
 import requests
 from datetime import datetime
 from google.cloud import bigquery
-from google.cloud.exceptions import BigQueryError
+from google.api_core.exceptions import GoogleAPIError
 from configure import api_key, project_id, dataset_name, table_name
 
 
@@ -65,7 +65,7 @@ except requests.RequestException as e:
     print("Error during API request", e)
 
 # BigQuery Error
-except BigQueryError as e:
+except GoogleAPIError as e:
     print("Error inserting data into BigQuery", e)
 
 # general errors
