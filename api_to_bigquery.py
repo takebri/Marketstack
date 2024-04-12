@@ -1,10 +1,13 @@
 # Script requests stock data from Marketstack REST API and uploads to BigQuery
 import requests
+import logging
 from datetime import datetime
 from google.cloud import bigquery
 from google.api_core.exceptions import GoogleAPIError
 from configure import api_key, project_id, dataset_name, table_name
 
+# Logging setup
+logging.basicConfig(level=logging.INFO)
 
 # Initialize BigQuery client
 client = bigquery.Client()
@@ -51,10 +54,10 @@ try:
         errors = client.insert_rows_json(table_id, rows_to_insert)
         # No error inserting into BigQuery
         if not errors:
-            print(f"Added {len(rows_to_insert)} rows into {table_id}.")
+            logging.info(f"Added {len(rows_to_insert)} rows into {table_id}.")
         # Error inserting into BigQuery
         else:
-            print('Error during BigQuery insertion', errors)
+            logging.error(f"Error during BigQuery insertion: {errors}")
     # Error retrieving data
     else:
         print('Failed to retrieve data. HTTP Status Code:',
@@ -62,12 +65,12 @@ try:
 
 # API errors
 except requests.RequestException as e:
-    print("Error during API request", e)
+    logging.error(f"Error during API request: {e}")
 
 # BigQuery Error
 except GoogleAPIError as e:
-    print("Error inserting data into BigQuery", e)
+    logging.error(f"Error inserting data into BigQuery: {e}")
 
 # general errors
 except Exception as e:
-    print("An unexpected error occurred:", e)
+    logging.error(f"An unexpected error occurred: {e}")
