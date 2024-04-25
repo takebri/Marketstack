@@ -9,6 +9,27 @@ from configure import api_key, project_id, dataset_name, table_name
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 
+
+def fetch_stock_data(api_key, symbol):
+    """Fetches stock data from Marketstack REST API"""
+    url = 'http://api.marketstack.com/v1/eod'
+    params = {'access_key': api_key, 'symbols': symbol}
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()    # Raise exception for HTTP error
+        if response.ok:
+            return response.json()['data']
+        else:
+            logging.error((
+                f"Failed to retrieve data. HTTP Status Code: "
+                f"{response.status_code}"
+            ))
+            return None
+    except requests.RequestException as e:
+        logging.error(f"Error during API request: {e}")
+        return None
+
+
 # Initialize BigQuery client
 client = bigquery.Client()
 
