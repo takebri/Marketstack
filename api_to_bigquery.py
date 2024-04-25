@@ -30,6 +30,21 @@ def fetch_stock_data(api_key, symbol):
         return None
 
 
+def transform_stock_data(stock_data):
+    """Transforms raw stock data into format for BigQuery insertion."""
+    return [
+        {
+            'Date': datetime.fromisoformat(row['date']).date()
+                            .strftime('%Y-%m-%d'),
+            'Open': row['open'],
+            'High': row['high'],
+            'Close': row['close'],
+            'Volume': row['volume']
+        }
+        for row in stock_data
+    ]
+
+
 # Initialize BigQuery client
 client = bigquery.Client()
 
@@ -60,8 +75,8 @@ try:
             # save fetched data
             rows_to_insert = [
                 {
-                    'Date': (datetime.fromisoformat(row['date']).date()
-                                     .strftime('%Y-%m-%d')),
+                    'Date': datetime.fromisoformat(row['date']).date()
+                                    .strftime('%Y-%m-%d'),
                     'Open': row['open'],
                     'High': row['high'],
                     'Low': row['low'],
