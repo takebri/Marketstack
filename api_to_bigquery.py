@@ -45,6 +45,19 @@ def transform_stock_data(stock_data):
     ]
 
 
+def insert_into_bigquery(client, table_id, rows_to_insert):
+    """Inserts transformed stock data into BigQuery."""
+    try:
+        errors = client.insert_rows_json(table_id, rows_to_insert)
+        if not errors:
+            logging.info(f"Added {len(rows_to_insert)} rows into {table_id}")
+        else:
+            logging.error(f"Error during BigQuery insertion: {errors}")
+    except GoogleAPIError as e:
+        logging.error(f"Error inserting data into BigQuery: {e}")
+    return
+
+
 # Initialize BigQuery client
 client = bigquery.Client()
 
