@@ -22,7 +22,7 @@ def fetch_stock_data(api_key, symbol):
         else:
             logging.error((
                 f"Failed to retrieve data. HTTP Status Code: "
-                f"{response.status_code}"
+                f"{response.status_code}, Reason: {response.text}"
             ))
             return None
     except requests.RequestException as e:
@@ -32,17 +32,26 @@ def fetch_stock_data(api_key, symbol):
 
 def transform_stock_data(stock_data):
     """Transforms raw stock data into format for BigQuery insertion."""
-    return [
-        {
-            'Date': datetime.fromisoformat(row['date']).date()
-                            .strftime('%Y-%m-%d'),
-            'Open': row['open'],
-            'High': row['high'],
-            'Close': row['close'],
-            'Volume': row['volume']
-        }
-        for row in stock_data
-    ]
+    transformed_rows = []
+    for row in stock_data:
+        try:
+            # Check if all required keys are present in the row
+            if all(key in row for key in
+                    ['date', 'open', 'high', 'close', 'volume']):
+                transformed_row = {
+                    'Date': datetime.fromisoformat(row['date']).date()
+                                    .strftime('%Y-%m-%d'),
+                    'Open': row['open'],
+                    'High': row['high'],
+                    'Close': row['close'],
+                    'Volume': row['volume']
+                }
+                transformed_rows.append(transformed_row)
+        except KeyError as ke:
+            logging.error(f"Missing key in row: {ke}. Skipping row: {row}")
+        except ValueError as ve:
+            logging.error(f"Invalid value in row: {ve}. Skipping row: {row}")
+    return transformed_rows
 
 
 def insert_into_bigquery(client, table_id, rows_to_insert):
